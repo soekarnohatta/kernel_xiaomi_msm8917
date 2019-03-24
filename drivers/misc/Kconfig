@@ -591,6 +591,11 @@ config TI_DRV2667
 	  To compile this driver as a module, choose M here: the
 	  module will be called ti_drv2667.
 
+config VIB_GPIO
+	tristate "Vibrator timed gpio driver"
+	depends on GPIOLIB && ANDROID_TIMED_OUTPUT
+	default n
+
 config QPNP_MISC
 	tristate "QPNP Misc Peripheral"
 	depends on SPMI || MSM_SPMI
@@ -600,18 +605,13 @@ config QPNP_MISC
 	  and the driver provides an API to check if this interrupt
 	  is available on the current PMIC chip.
 
-config UID_SYS_STATS_DEBUG
-	bool "Per-TASK statistics"
-	depends on UID_SYS_STATS
-	default n
+config ANT_CHECK
+	tristate "ant check gpio"
 	help
-	  Per TASK based io statistics exported to /proc/uid_io
-
-config MEMORY_STATE_TIME
-	tristate "Memory freq/bandwidth time statistics"
-	depends on PROFILING
-	help
-	  Memory time statistics exported to /sys/kernel/memory_state_time
+	  Say 'y' here to include support for the QTI QPNP MISC
+	  peripheral. The MISC peripheral holds the USB ID interrupt
+	  and the driver provides an API to check if this interrupt
+	  is available on the current PMIC chip.
 
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
