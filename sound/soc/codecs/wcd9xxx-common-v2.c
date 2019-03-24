@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2015-2017, 2019, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+>>>>>>> b412586319d39... sound: soc: Import Xiaomi changes for ugglite
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -194,7 +198,7 @@ void wcd_clsh_imped_config(struct snd_soc_codec *codec, int imped, bool reset)
 		return;
 	}
 	index = get_impedance_index(imped);
-	if (index >= (ARRAY_SIZE(imped_index) - 1)) {
+	if (index >= ARRAY_SIZE(imped_index)) {
 		pr_debug("%s, impedance not in range = %d\n", __func__, imped);
 		return;
 	}
