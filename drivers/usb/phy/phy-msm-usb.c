@@ -1,4 +1,5 @@
 /* Copyright (c) 2009-2018, Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -104,7 +105,7 @@ module_param(lpm_disconnect_thresh , uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(lpm_disconnect_thresh,
 	"Delay before entering LPM on USB disconnect");
 
-static bool floated_charger_enable;
+static bool floated_charger_enable = 1;
 module_param(floated_charger_enable , bool, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(floated_charger_enable,
 	"Whether to enable floated charger");
@@ -763,15 +764,13 @@ static int msm_otg_reset(struct usb_phy *phy)
 		dev_err(phy->dev, "phy_reset failed\n");
 		if (motg->phy_irq)
 			enable_irq(motg->phy_irq);
-
-		enable_irq(motg->irq);
+			enable_irq(motg->irq);
 		return ret;
 	}
 
 	if (motg->phy_irq)
 		enable_irq(motg->phy_irq);
-
-	enable_irq(motg->irq);
+		enable_irq(motg->irq);
 	ret = msm_otg_link_reset(motg);
 	if (ret) {
 		dev_err(phy->dev, "link reset failed\n");
@@ -1698,6 +1697,7 @@ skip_phy_resume:
 		usb_hcd_resume_root_hub(hcd);
 		schedule_delayed_work(&motg->perf_vote_work,
 			msecs_to_jiffies(1000 * PM_QOS_SAMPLE_SEC));
+		msm_id_status_w(&motg->id_status_work.work);
 	}
 
 	dev_info(phy->dev, "USB exited from low power mode\n");
@@ -2859,14 +2859,22 @@ static void msm_otg_sm_work(struct work_struct *w)
 					break;
 				case USB_FLOATED_CHARGER:
 					msm_otg_notify_charger(motg,
-							IDEV_CHG_MAX);
+							500);
 					otg->phy->state = OTG_STATE_B_CHARGER;
 					break;
 				case USB_CDP_CHARGER:
 					msm_otg_notify_charger(motg,
-							IDEV_CHG_MAX);
+							1500);
+					pm_runtime_get_sync(otg->phy->dev);
+					msm_otg_start_peripheral(otg, 1);
+					otg->phy->state =
+						OTG_STATE_B_PERIPHERAL;
+					mod_timer(&motg->chg_check_timer,
+							CHG_RECHECK_DELAY);
+					break;
 					/* fall through */
 				case USB_SDP_CHARGER:
+					msm_otg_notify_charger(motg, 500);
 					pm_runtime_get_sync(otg->phy->dev);
 					msm_otg_start_peripheral(otg, 1);
 					otg->phy->state =
@@ -3069,6 +3077,7 @@ static void msm_otg_set_vbus_state(int online)
 		pr_debug("PMIC: BSV set\n");
 		msm_otg_dbg_log_event(&motg->phy, "PMIC: BSV SET",
 				init, motg->inputs);
+		msleep(500);
 		if (test_and_set_bit(B_SESS_VLD, &motg->inputs) && init)
 			return;
 	} else {
