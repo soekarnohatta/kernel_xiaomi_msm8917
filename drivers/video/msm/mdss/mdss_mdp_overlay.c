@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -4974,10 +4975,9 @@ static int mdss_bl_scale_config(struct msm_fb_data_type *mfd,
 	pr_debug("update scale = %d, min_lvl = %d\n", mfd->bl_scale,
 							mfd->bl_min_lvl);
 
-	/* Update current backlight to use new scaling, if it is not zero */
-	if (curr_bl)
+	/* update current backlight to use new scaling*/
+	if(curr_bl)
 		mdss_fb_set_backlight(mfd, curr_bl);
-
 	mutex_unlock(&mfd->bl_lock);
 	return ret;
 }
