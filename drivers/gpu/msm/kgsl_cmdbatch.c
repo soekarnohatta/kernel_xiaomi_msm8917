@@ -1,4 +1,5 @@
 /* Copyright (c) 2008-2017,2019, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -241,7 +242,7 @@ static inline void _free_memobj_list(struct list_head *list)
 void kgsl_cmdbatch_destroy(struct kgsl_cmdbatch *cmdbatch)
 {
 	unsigned int i;
-	unsigned long flags;
+	unsigned long pending, flags;
 
 	if (IS_ERR_OR_NULL(cmdbatch))
 		return;
