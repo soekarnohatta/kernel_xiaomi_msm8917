@@ -440,6 +440,7 @@ struct mdss_dsi_ctrl_pdata {
 	int ocp2131_enp_gpio;
 	int ocp2131_enn_gpio;
 
+	int intf_mux_gpio;
 	int bklt_ctrl;	/* backlight ctrl */
 	bool pwm_pmi;
 	int pwm_period;

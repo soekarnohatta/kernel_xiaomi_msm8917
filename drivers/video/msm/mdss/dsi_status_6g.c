@@ -41,7 +41,7 @@ static bool mdss_check_te_status(struct mdss_dsi_ctrl_pdata *ctrl_pdata,
 	ret = wait_for_completion_timeout(&ctrl_pdata->te_irq_comp,
 			msecs_to_jiffies(interval));
 		pr_debug("%s: TE IRQ line not enabled yet\n", __func__);
-	}
+	
 	if(!ret) {
 		printk("%s:%d te_signal test failed ret=%d\n",__func__,__LINE__,ret);
 	}
