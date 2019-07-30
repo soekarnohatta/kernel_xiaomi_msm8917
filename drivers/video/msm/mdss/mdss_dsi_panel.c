@@ -36,6 +36,7 @@
 #define DEFAULT_MDP_TRANSFER_TIME 14000
 
 #define VSYNC_DELAY msecs_to_jiffies(17)
+
 char g_lcd_id[128];
 DEFINE_LED_TRIGGER(bl_led_trigger);
 
@@ -1953,7 +1954,7 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 				ctrl->status_value[group + 0]){
 				printk("return_buf[i]=%d\n",ctrl->return_buf[i]);
 				break;
-			}
+
 			/*to check the panel register */
 			if(strstr(g_lcd_id, "tm otm1901a") != NULL) {
 				if (ctrl->return_buf[1] !=
@@ -3263,7 +3264,7 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->panel_data.apply_display_setting =
 			mdss_dsi_panel_apply_display_setting;
 	ctrl_pdata->switch_mode = mdss_dsi_panel_switch_mode;
-
+	ctrl_pdata->panel_data.get_idle = mdss_dsi_panel_get_idle_mode;
 	msm_lcd_name_create_sysfs();
 	return 0;
 }
