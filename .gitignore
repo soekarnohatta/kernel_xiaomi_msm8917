@@ -103,3 +103,4 @@ android/configs/android-*.cfg
 # Misc
 do_job
 /AnyKernel
+/out

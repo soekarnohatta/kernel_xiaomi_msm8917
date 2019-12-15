@@ -242,7 +242,7 @@ static inline void _free_memobj_list(struct list_head *list)
 void kgsl_cmdbatch_destroy(struct kgsl_cmdbatch *cmdbatch)
 {
 	unsigned int i;
-	unsigned long pending, flags;
+	unsigned long flags;
 
 	if (IS_ERR_OR_NULL(cmdbatch))
 		return;
