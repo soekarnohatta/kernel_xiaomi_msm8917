@@ -524,22 +524,6 @@ static void __mdss_fb_idle_notify_work(struct work_struct *work)
 	mfd->idle_state = MDSS_FB_IDLE;
 }
 
-
-static ssize_t mdss_fb_get_fps_info(struct device *dev,
-		struct device_attribute *attr, char *buf)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = fbi->par;
-	unsigned int fps_int , fps_float;
-
-	if (mfd->panel_power_state != MDSS_PANEL_POWER_ON)
-		mfd->fps_info.measured_fps = 0;
-	fps_int = (unsigned int) mfd->fps_info.measured_fps;
-	fps_float = do_div(fps_int, 10);
-	return scnprintf(buf, PAGE_SIZE, "%d.%d\n", fps_int, fps_float);
-
-}
-
 static ssize_t mdss_fb_get_idle_time(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {

@@ -229,7 +229,6 @@ rtc_sysfs_set_wakealarm(struct device *dev, struct device_attribute *attr,
 	buf_ptr = (char *)buf;
 	alarm = simple_strtoul(buf_ptr, NULL, 0);
 	printk("rtc_sysfs_set_wakealarm enter alarm = %ld\n",alarm);
-		set_power_on_alarmExt(alarm,1);
 		return n;
 #endif
 }
