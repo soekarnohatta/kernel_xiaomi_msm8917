@@ -507,8 +507,6 @@ asmlinkage __visible void __init start_kernel(void)
 {
 	char *command_line;
 	char *after_dashes;
-	char *p=NULL;
-	char *tp=NULL;
 	/*
 	 * Need to run as early as possible, to initialize the
 	 * lockdep hash:

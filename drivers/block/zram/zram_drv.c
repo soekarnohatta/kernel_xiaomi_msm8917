@@ -1292,8 +1292,6 @@ out:
 
 static void destroy_devices(unsigned int nr)
 {
-	del_gendisk(zram->disk);
-	put_disk(zram->disk);
 
 	kfree(zram_devices);
 	unregister_blkdev(zram_major, "zram");
