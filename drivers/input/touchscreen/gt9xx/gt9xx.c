@@ -2256,6 +2256,32 @@ int goodix_remove_sysfs(struct i2c_client * client)
 	return 0;
 }
 
+static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
+{
+	int ret = 0;
+	char *double_tap_sysfs_node;
+	struct proc_dir_entry *proc_entry_tp = NULL;
+	struct proc_dir_entry *proc_symlink_tmp = NULL;
+	proc_entry_tp = proc_mkdir("gesture", NULL);
+	if (proc_entry_tp == NULL) {
+	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+	       ret = -ENOMEM;
+	}
+
+	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (double_tap_sysfs_node)
+	       sprintf(double_tap_sysfs_node, "/sys/%s/%s", "goodix_gesture", "gesture_enable");
+	proc_symlink_tmp = proc_symlink("onoff",
+	       proc_entry_tp, double_tap_sysfs_node);
+	if (proc_symlink_tmp == NULL) {
+	       ret = -ENOMEM;
+	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+	}
+
+	kfree(double_tap_sysfs_node);
+	return ret;
+}
+
 
 
 static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
@@ -2371,6 +2397,8 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 	if (ret) {
 		GTP_ERROR("%s: sysfs_create_version_file failed\n", __func__);
 	}
+
+        gesture_proc_symlink(client->dev.kobj.sd); 
 #endif
 
 #if GTP_ESD_PROTECT
