@@ -121,8 +121,6 @@ static int register_ptt_btn(void)
 	}
 	return 0;
 }
-
-/*
 static void ptt_btn_get_pinctrl_configs(struct snd_soc_card *card)
 {
 	struct pinctrl_state *set_state;
@@ -145,7 +143,6 @@ static void ptt_btn_get_pinctrl_configs(struct snd_soc_card *card)
 		ptt_btn_state_suspend = set_state;
 	}
 }
-*/
 
 static void wcd_ptt_btn_fn(struct work_struct *work)
 {
