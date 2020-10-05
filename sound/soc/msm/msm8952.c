@@ -724,7 +724,7 @@ static int msm_mi2s_sclk_ctl(struct snd_pcm_substream *substream, bool enable)
 				mi2s_tx_clk.clk_id =
 						msm8952_get_clk_id(port_id);
 				mi2s_tx_clk.clk_freq_in_hz =
-						get_mi2s_rx_clk_val(port_id);
+						Q6AFE_LPASS_IBIT_CLK_1_P536_MHZ;
 		#ifdef CONFIG_TAS2557_EXIST_D3
 
 				if (is_smartpa_mi2s_tx_port(port_id))

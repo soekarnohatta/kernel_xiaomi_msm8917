@@ -54,12 +54,11 @@
 
 #define WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS  50
 #define ANC_DETECT_RETRY_CNT 7
-#define WCD_MBHC_SPL_HS_CNT  2
-#define PA_GPIO 1
 
 #define WCD_MBHC_SPL_HS_CNT  1
 #define PA_GPIO 1
 static int det_extn_cable_en;
+
 #if defined (CONFIG_UGGLITE) || defined (CONFIG_UGG)
 		 int smg_enable_gpio = 0;
 		 int smg_in_gpio = 0;
@@ -2662,6 +2661,28 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_codec *codec,
 			"%s: missing %d in dt node\n", __func__, max_enable_gpio);
 	}
 
+/*	pinctrl_select_state(ptt_btn_pinctrl, ptt_btn_state_active); */
+	if (of_property_read_bool(card->dev->of_node, "qcom,ptt_supported")) {
+		mbhc->ptt_supported = true;
+
+		ptt_btn_get_pinctrl_configs(card);
+		mbhc->ptt_btn = of_get_named_gpio(card->dev->of_node,
+					"qcom,ptt-btn-gpio", 0);
+		if (gpio_is_valid(mbhc->ptt_btn))
+			gpio_request_one(mbhc->ptt_btn, GPIOF_DIR_IN, "ptt_btn");
+		mbhc->audio_sw = of_get_named_gpio(card->dev->of_node,
+					"qcom,audio-switch-gpio", 0);
+		if (gpio_is_valid(mbhc->audio_sw))
+			gpio_request_one(mbhc->audio_sw,
+				GPIOF_DIR_OUT | GPIOF_INIT_LOW, "audio_sw");
+		mbhc->headset_sel = of_get_named_gpio(card->dev->of_node,
+					"qcom,headset-sel-gpio", 0);
+		if (gpio_is_valid(mbhc->headset_sel))
+			gpio_request_one(mbhc->headset_sel,
+				GPIOF_DIR_OUT | GPIOF_INIT_LOW, "headset_sel");
+	} else {
+		mbhc->ptt_supported = false;
+	}
 	if (gpio_is_valid(max_enable_gpio)) {
 		if (gpio_request(max_enable_gpio, "MAX97220_ENABLE")) {
 			pr_err("%s: Failed to request gpio %d\n",
