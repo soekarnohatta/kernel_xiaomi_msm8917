@@ -1,10 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (c) 2015-2017, 2019, The Linux Foundation. All rights reserved.
-=======
  * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
->>>>>>> b412586319d39... sound: soc: Import Xiaomi changes for ugglite
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
  * only version 2 as published by the Free Software Foundation.
