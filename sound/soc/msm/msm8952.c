@@ -58,7 +58,7 @@
 #define MAX_WSA_CODEC_NAME_LENGTH 80
 #define MSM_DT_MAX_PROP_SIZE 80
 
-enum btsco_rates {
+enum btsco_rate {
 	RATE_8KHZ_ID,
 	RATE_16KHZ_ID,
 };
@@ -135,7 +135,7 @@ static struct afe_clk_cfg mi2s_rx_clk_v1 = {
 	0,
 };
 
-static struct afe_clk_cfg mi2s_tx_clk_v1 = {
+static struct afe_clk_cfg mi2s_tx_clk_v1 =	{	
 	AFE_API_VERSION_I2S_CONFIG,
 	Q6AFE_LPASS_IBIT_CLK_1_P536_MHZ,
 	Q6AFE_LPASS_OSR_CLK_12_P288_MHZ,
@@ -2690,6 +2690,8 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.ops = &msm8952_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
+
+/*
 	{
 		.name = LPASS_BE_QUAT_MI2S_RX,
 		.stream_name = "Quaternary MI2S Playback",
@@ -2707,7 +2709,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.be_id = MSM_BACKEND_DAI_QUATERNARY_MI2S_RX,
 		.be_hw_params_fixup = msm_mi2s_rx_be_hw_params_fixup,
 		.ops = &msm8952_quat_mi2s_be_ops,
-		.ignore_pmdown_time = 1, /* dai link has playback support */
+		.ignore_pmdown_time = 1,
 		.ignore_suspend = 1,
 	},
 	{
@@ -2729,6 +2731,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.ops = &msm8952_quat_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
+*/
 	/* Primary AUX PCM Backend DAI Links */
 	{
 		.name = LPASS_BE_AUXPCM_RX,
@@ -3572,6 +3575,7 @@ static struct snd_soc_card *msm8952_populate_sndcard_dailinks(
 
 #ifdef CONFIG_TAS2557_EXIST_D3
 static struct snd_soc_dai_link msm8952_dailink_custom[] = {
+	/*
 	{
 		.name = LPASS_BE_QUAT_MI2S_RX,
 		.stream_name = "Quaternary MI2S Playback",
@@ -3586,7 +3590,7 @@ static struct snd_soc_dai_link msm8952_dailink_custom[] = {
 		.ops = &msm8952_quat_mi2s_be_ops,
 		.ignore_pmdown_time = 1,
 		.ignore_suspend = 1,
-	},
+	},*/
 	{
 		.name = LPASS_BE_QUAT_MI2S_TX,
 		.stream_name = "Quaternary MI2S Capture",

@@ -119,28 +119,6 @@ static int register_ptt_btn(void)
 	}
 	return 0;
 }
-static void ptt_btn_get_pinctrl_configs(struct snd_soc_card *card)
-{
-	struct pinctrl_state *set_state;
-
-	ptt_btn_pinctrl = devm_pinctrl_get(card->dev);
-	if (IS_ERR_OR_NULL(ptt_btn_pinctrl)) {
-		pr_err("pin control handle failed\n");
-	} else {
-		set_state = pinctrl_lookup_state(ptt_btn_pinctrl, "ptt_btn_active");
-		if (IS_ERR_OR_NULL(set_state)) {
-			dev_err(card->dev,
-					"pinctrl lookup failed for default state");
-		}
-		ptt_btn_state_active = set_state;
-		set_state = pinctrl_lookup_state(ptt_btn_pinctrl, "ptt_btn_sleep");
-		if (IS_ERR_OR_NULL(set_state)) {
-			dev_err(card->dev,
-					"pinctrl lookup failed for sleep state");
-		}
-		ptt_btn_state_suspend = set_state;
-	}
-}
 
 static void wcd_ptt_btn_fn(struct work_struct *work)
 {
