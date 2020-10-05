@@ -384,6 +384,37 @@ int fts_gesture_resume(struct i2c_client *client)
 		return 0;
 }
 
+static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
+{
+	int ret = 0;
+	char *buf, *path = NULL;
+	char *double_tap_sysfs_node;
+	struct proc_dir_entry *proc_entry_tp = NULL;
+	struct proc_dir_entry *proc_symlink_tmp = NULL;
+	buf = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (buf)
+	       path = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
+	proc_entry_tp = proc_mkdir("gesture", NULL);
+	if (proc_entry_tp == NULL) {
+	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+	       ret = -ENOMEM;
+	}
+
+	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (double_tap_sysfs_node)
+	       sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "fts_gesture_mode");
+	proc_symlink_tmp = proc_symlink("onoff",
+	       proc_entry_tp, double_tap_sysfs_node);
+	if (proc_symlink_tmp == NULL) {
+	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+		   ret = -ENOMEM;
+	}
+
+	kfree(buf);
+	kfree(double_tap_sysfs_node);
+	return ret;
+}
+
 int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 {
 	struct fts_ts_data *data = i2c_get_clientdata(client);
@@ -420,6 +451,7 @@ int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 		__set_bit(KEY_GESTURE_Z, input_dev->keybit);
 
 		fts_create_gesture_sysfs(client);
+		gesture_proc_symlink(client->dev.kobj.sd);
 		fts_gesture_data.mode = 0;
 		fts_gesture_data.active = 0;
 	data->gesture_data = &fts_gesture_data;
