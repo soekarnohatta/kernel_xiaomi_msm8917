@@ -2264,7 +2264,7 @@ static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 	struct proc_dir_entry *proc_symlink_tmp = NULL;
 	proc_entry_tp = proc_mkdir("gesture", NULL);
 	if (proc_entry_tp == NULL) {
-	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+	       GTP_ERROR("%s: Couldn't create gesture dir in procfs\n", __func__);
 	       ret = -ENOMEM;
 	}
 
@@ -2274,8 +2274,8 @@ static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 	proc_symlink_tmp = proc_symlink("onoff",
 	       proc_entry_tp, double_tap_sysfs_node);
 	if (proc_symlink_tmp == NULL) {
-	       ret = -ENOMEM;
-	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+	       GTP_ERROR("%s: Couldn't create double_tap_enable symlink\n", __func__);
+		   ret = -ENOMEM;
 	}
 
 	kfree(double_tap_sysfs_node);
@@ -2398,7 +2398,7 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 		GTP_ERROR("%s: sysfs_create_version_file failed\n", __func__);
 	}
 
-        gesture_proc_symlink(client->dev.kobj.sd); 
+    gesture_proc_symlink(client->dev.kobj.sd); 
 #endif
 
 #if GTP_ESD_PROTECT
@@ -2660,7 +2660,9 @@ static int gtp_fb_notifier_callback(struct notifier_block *noti, unsigned long e
 		}
 #else
 		if (event == FB_EVENT_BLANK) {
-			if (*blank == FB_BLANK_UNBLANK) {
+			if (*blank == FB_BLANK_UNBLANK
+					|| *blank == FB_BLANK_NORMAL
+				    || *blank == FB_BLANK_VSYNC_SUSPEND) {
 				GTP_DEBUG("Resume by fb notifier.");
 				goodix_ts_resume(ts);
 
