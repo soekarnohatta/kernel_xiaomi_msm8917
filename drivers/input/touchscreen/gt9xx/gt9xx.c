@@ -2256,7 +2256,7 @@ int goodix_remove_sysfs(struct i2c_client * client)
 	return 0;
 }
 
-struct proc_dir_entry *proc_entry_tp = NULL;
+static struct proc_dir_entry *proc_entry_tp = NULL;
 static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 {
 	int ret = 0;

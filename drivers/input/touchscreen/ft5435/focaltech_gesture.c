@@ -17,6 +17,7 @@
  */
 
 #include "focaltech_core.h"
+#include <linux/kernfs.h>
 #if FTS_GESTURE_EN
 #define KEY_GESTURE_U                           KEY_WAKEUP
 #define KEY_GESTURE_UP                          KEY_UP
@@ -385,49 +386,39 @@ int fts_gesture_resume(struct i2c_client *client)
 }
 
 /* start symlink function by soekarnohatta */
-struct proc_dir_entry *proc_entry_tp = NULL;
+static struct proc_dir_entry *proc_entry_tp = NULL;
 static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 {
-	 int len, ret = 0;
-       char *buf;
-       char *double_tap_sysfs_node;
-       struct proc_dir_entry *proc_symlink_tmp = NULL;
-		
-	pr_info("start symlink dt2w to procfs by nayef")
-       buf = kzalloc(PATH_MAX, GFP_KERNEL);
-       if (buf) {
-               len = kernfs_path_from_node(sysfs_node_parent, NULL, buf, PATH_MAX);
-               if (unlikely(len >= PATH_MAX)) {
-                          pr_err("%s: Buffer too long: %d\n", __func__, len);
-                          ret = -ERANGE;
-                          goto exit;
-               }
-       }
+	int ret = 0;
+	char *buf, *path = NULL;
+	char *double_tap_sysfs_node;
+	struct proc_dir_entry *proc_entry_tp = NULL;
+	struct proc_dir_entry *proc_symlink_tmp = NULL;
+	 pr_info("start link dt2w node to procfs by nayef");
+	buf = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (buf)
+	       path = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
+	proc_entry_tp = proc_mkdir("gesture", NULL);
+	if (proc_entry_tp == NULL) {
+	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+	       ret = -ENOMEM;
+	}
 
-       proc_entry_tp = proc_mkdir("gesture", NULL);
-       if (proc_entry_tp == NULL) {
-               pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
-               ret = -ENOMEM;
-               goto exit;
-       }
+	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (double_tap_sysfs_node)
+	       sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "fts_gesture_mode");
+	pr_info("real dt2w node is in: %s", path);
+	proc_symlink_tmp = proc_symlink("onoff",
+	       proc_entry_tp, double_tap_sysfs_node);
+	if (proc_symlink_tmp == NULL) {
+	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+		   ret = -ENOMEM;
+	}
+	pr_info("end work link dt2w node to procfs");
 
-       double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
-       if (double_tap_sysfs_node)
-               sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, "fts_gesture_mode");
-       proc_symlink_tmp = proc_symlink("onoff",
-               proc_entry_tp, double_tap_sysfs_node);
-       if (proc_symlink_tmp == NULL) {
-               pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
-               ret = -ENOMEM;
-               goto exit;
-       }
-	   pr_info("real node is located in %s\n", double_tap_sysfs_node)
-	   pr_info("stop symlink dt2w to procfs by nayef")
-
-exit:
-       kfree(buf);
-       kfree(double_tap_sysfs_node);
-       return ret;
+	kfree(buf);
+	kfree(double_tap_sysfs_node);
+	return ret;
 }
 /* end symlink function by soekarnohatta */
 
