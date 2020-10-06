@@ -2256,11 +2256,12 @@ int goodix_remove_sysfs(struct i2c_client * client)
 	return 0;
 }
 
+struct proc_dir_entry *proc_entry_tp = NULL;
 static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 {
 	int ret = 0;
 	char *double_tap_sysfs_node;
-	struct proc_dir_entry *proc_entry_tp = NULL;
+	
 	struct proc_dir_entry *proc_symlink_tmp = NULL;
 	proc_entry_tp = proc_mkdir("gesture", NULL);
 	if (proc_entry_tp == NULL) {
@@ -2472,11 +2473,13 @@ err_free_gpio:
 	kfree(ts);
 	return ret;
 }
+
 static int goodix_ts_remove(struct i2c_client *client)
 {
 	struct goodix_ts_data *ts = i2c_get_clientdata(client);
 
 	GTP_DEBUG_FUNC();
+	remove_proc_entry("onoff", proc_entry_tp);
 
 	gtp_unregister_powermanger(ts);
 

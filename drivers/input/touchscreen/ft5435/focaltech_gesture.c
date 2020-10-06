@@ -384,36 +384,52 @@ int fts_gesture_resume(struct i2c_client *client)
 		return 0;
 }
 
+/* start symlink function by soekarnohatta */
+struct proc_dir_entry *proc_entry_tp = NULL;
 static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 {
-	int ret = 0;
-	char *buf, *path = NULL;
-	char *double_tap_sysfs_node;
-	struct proc_dir_entry *proc_entry_tp = NULL;
-	struct proc_dir_entry *proc_symlink_tmp = NULL;
-	buf = kzalloc(PATH_MAX, GFP_KERNEL);
-	if (buf)
-	       path = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
-	proc_entry_tp = proc_mkdir("gesture", NULL);
-	if (proc_entry_tp == NULL) {
-	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
-	       ret = -ENOMEM;
-	}
+	 int len, ret = 0;
+       char *buf;
+       char *double_tap_sysfs_node;
+       struct proc_dir_entry *proc_symlink_tmp = NULL;
+		
+	pr_info("start symlink dt2w to procfs by nayef")
+       buf = kzalloc(PATH_MAX, GFP_KERNEL);
+       if (buf) {
+               len = kernfs_path_from_node(sysfs_node_parent, NULL, buf, PATH_MAX);
+               if (unlikely(len >= PATH_MAX)) {
+                          pr_err("%s: Buffer too long: %d\n", __func__, len);
+                          ret = -ERANGE;
+                          goto exit;
+               }
+       }
 
-	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
-	if (double_tap_sysfs_node)
-	       sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "fts_gesture_mode");
-	proc_symlink_tmp = proc_symlink("onoff",
-	       proc_entry_tp, double_tap_sysfs_node);
-	if (proc_symlink_tmp == NULL) {
-	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
-		   ret = -ENOMEM;
-	}
+       proc_entry_tp = proc_mkdir("gesture", NULL);
+       if (proc_entry_tp == NULL) {
+               pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+               ret = -ENOMEM;
+               goto exit;
+       }
 
-	kfree(buf);
-	kfree(double_tap_sysfs_node);
-	return ret;
+       double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
+       if (double_tap_sysfs_node)
+               sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, "fts_gesture_mode");
+       proc_symlink_tmp = proc_symlink("onoff",
+               proc_entry_tp, double_tap_sysfs_node);
+       if (proc_symlink_tmp == NULL) {
+               pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+               ret = -ENOMEM;
+               goto exit;
+       }
+	   pr_info("real node is located in %s\n", double_tap_sysfs_node)
+	   pr_info("stop symlink dt2w to procfs by nayef")
+
+exit:
+       kfree(buf);
+       kfree(double_tap_sysfs_node);
+       return ret;
 }
+/* end symlink function by soekarnohatta */
 
 int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 {
@@ -454,7 +470,7 @@ int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 		gesture_proc_symlink(client->dev.kobj.sd);
 		fts_gesture_data.mode = 0;
 		fts_gesture_data.active = 0;
-	data->gesture_data = &fts_gesture_data;
+		data->gesture_data = &fts_gesture_data;
 		FTS_FUNC_EXIT();
 		return 0;
 }
@@ -463,6 +479,7 @@ int fts_gesture_exit(struct i2c_client *client)
 {
 		FTS_FUNC_ENTER();
 		sysfs_remove_group(&client->dev.kobj, &fts_gesture_group);
+		remove_proc_entry("onoff", proc_entry_tp);
 		FTS_FUNC_EXIT();
 		return 0;
 }
