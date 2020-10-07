@@ -275,6 +275,13 @@ static struct dsi_cmd_desc backlight_cmd = {
 	led_pwm1
 };
 
+extern int ID0_status,ID1_status;
+static char led_pwm2[3] = {0x51, 0x0 ,0x0};	/* DTYPE_DCS_WRITE1 */
+static struct dsi_cmd_desc backlight_cmd2 = {
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(led_pwm2)},
+	led_pwm2
+};
+
 static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 {
 	struct dcs_cmd_req cmdreq;
@@ -287,11 +294,20 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 	}
 
 	pr_debug("%s: level=%d\n", __func__, level);
-
-	led_pwm1[1] = (unsigned char)level;
+	if((ID0_status==0) && (ID1_status==0)) {
+		led_pwm2[1] = (unsigned char)((level & 0xf0)>>4);
+		led_pwm2[2] = (unsigned char)((level & 0x0f)<<4);
+		pr_debug("swb.%s led_pwm2[1]= 0x%x,led_pwm2[2]=0x%x\n",__func__,led_pwm2[1],led_pwm2[2]);
+	} else{
+		led_pwm1[1] = (unsigned char)level;
+		pr_debug("swb.%s ugglite and ugg use default led_pwm1\n",__func__);
+	}
 
 	memset(&cmdreq, 0, sizeof(cmdreq));
-	cmdreq.cmds = &backlight_cmd;
+	if((ID0_status==0) && (ID1_status==0)) {
+		cmdreq.cmds = &backlight_cmd2;
+	} else
+		cmdreq.cmds = &backlight_cmd;
 	cmdreq.cmds_cnt = 1;
 	cmdreq.flags = CMD_REQ_COMMIT;
 	cmdreq.rlen = 0;
