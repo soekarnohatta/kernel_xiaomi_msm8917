@@ -406,7 +406,7 @@ static int gesture_proc_symlink(struct kernfs_node *sysfs_node_parent)
 
 	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
 	if (double_tap_sysfs_node)
-	       sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "fts_gesture_mode");
+	       sprintf(double_tap_sysfs_node, "/sys%s/input/input2/device/%s", path, "fts_gesture_mode");
 	pr_info("real dt2w node is in: %s", path);
 	proc_symlink_tmp = proc_symlink("onoff",
 	       proc_entry_tp, double_tap_sysfs_node);
